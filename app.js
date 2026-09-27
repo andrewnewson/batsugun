@@ -4,7 +4,7 @@ const TYPES = [
   "Rock", "Ghost", "Dragon", "Steel", "Dark", "Fairy"
 ];
 
-// Attacking Type -> Defending Type -> Multiplier (defaults to 1 if omitted)
+// Attacking Move Type -> Defending Pokémon Type -> Multiplier (defaults to 1 if omitted)
 const TYPE_CHART = {
   Normal:   { Rock: 0.5, Ghost: 0, Steel: 0.5 },
   Fire:     { Fire: 0.5, Water: 0.5, Grass: 2, Ice: 2, Bug: 2, Rock: 0.5, Dragon: 0.5, Steel: 2 },
@@ -53,7 +53,7 @@ function handleTypeToggle(type) {
     selectedTypes = selectedTypes.filter(t => t !== type);
   } else {
     if (selectedTypes.length >= 2) {
-      selectedTypes.shift(); // Drop the oldest if 2 are already picked
+      selectedTypes.shift(); // Drop the first selected type if 2 are already active
     }
     selectedTypes.push(type);
   }
@@ -89,15 +89,15 @@ function calculateMatchups(t1, t2) {
 }
 
 function render() {
-  // Update button active states
+  // Update button active borders/shadows
   document.querySelectorAll(".type-btn").forEach(btn => {
     btn.classList.toggle("selected", selectedTypes.includes(btn.dataset.type));
   });
 
-  // Update selected display
+  // Update target Pokémon types display
   activePills.innerHTML = "";
   if (selectedTypes.length === 0) {
-    activePills.innerHTML = '<span class="placeholder">Select 1 or 2 types below...</span>';
+    activePills.innerHTML = '<span class="placeholder">Select target type(s) below...</span>';
   } else {
     selectedTypes.forEach(type => {
       const badge = document.createElement("span");
@@ -107,7 +107,7 @@ function render() {
     });
   }
 
-  // Update results
+  // Update attacking move effectiveness tiers
   matchupResults.innerHTML = "";
   if (selectedTypes.length === 0) return;
 
@@ -115,12 +115,12 @@ function render() {
   const tiers = calculateMatchups(t1, t2);
 
   const tierConfigs = [
-    { key: 4, label: "Takes 4x Damage", tagClass: "tag-4x" },
-    { key: 2, label: "Takes 2x Damage", tagClass: "tag-2x" },
-    { key: 0.5, label: "Takes 0.5x Damage", tagClass: "tag-05x" },
-    { key: 0.25, label: "Takes 0.25x Damage", tagClass: "tag-025x" },
-    { key: 0, label: "Takes 0x Damage (Immune)", tagClass: "tag-0x" },
-    { key: 1, label: "Takes 1x Damage (Neutral)", tagClass: "tag-1x" }
+    { key: 4,    label: "Super Effective (4x Damage)",  tagClass: "tag-4x" },
+    { key: 2,    label: "Super Effective (2x Damage)",  tagClass: "tag-2x" },
+    { key: 0.5,  label: "Not Very Effective (½x Damage)", tagClass: "tag-05x" },
+    { key: 0.25, label: "Not Very Effective (¼x Damage)", tagClass: "tag-025x" },
+    { key: 0,    label: "No Effect (0x Damage / Immune)", tagClass: "tag-0x" },
+    { key: 1,    label: "Regular Effectiveness (1x Damage)", tagClass: "tag-1x" }
   ];
 
   tierConfigs.forEach(({ key, label, tagClass }) => {
